@@ -18,7 +18,7 @@
             <span v-else>-</span>
           </template>
           <template v-else-if="col.type === 'media'" #default="{ row }">
-            <el-image v-if="row[col.key]" :src="row[col.key]" style="width:80px;height:45px" fit="cover" :preview-src-list="[row[col.key]]" preview-teleported />
+            <video v-if="row[col.key]" :src="row[col.key]" style="width:80px;height:45px;object-fit:cover;border-radius:4px" controls preload="metadata" />
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -175,6 +175,11 @@ async function doUpload(opt, field) {
   }
 }
 async function create() {
+  const nameField = cur.value.form.find((f) => f.key === 'name')
+  if (nameField && (!form.value.name || !String(form.value.name).trim())) {
+    ElMessage.warning('请先填写名称')
+    return
+  }
   const data = { ...form.value }
   Object.keys(data).forEach((k) => { if (data[k] === '' || data[k] === undefined) delete data[k] })
   try {

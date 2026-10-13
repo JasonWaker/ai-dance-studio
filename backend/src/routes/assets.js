@@ -41,10 +41,17 @@ for (const [key, conf] of Object.entries(tables)) {
   })
   // 新增
   router.post(`/${key}`, (req, res) => {
+    if (!req.body.name || !String(req.body.name).trim()) {
+      return res.status(400).json({ error: '名称不能为空' })
+    }
     const id = uuid()
     const cols = ['id', ...conf.fields]
     const vals = [id, ...conf.fields.map((f) => req.body[f] ?? null)]
-    db.prepare(`INSERT INTO ${conf.table} (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`).run(...vals)
+    try {
+      db.prepare(`INSERT INTO ${conf.table} (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`).run(...vals)
+    } catch (e) {
+      return res.status(400).json({ error: '保存失败：' + (e.message || '数据错误') })
+    }
     res.json(db.prepare(`SELECT * FROM ${conf.table} WHERE id = ?`).get(id))
   })
   // 更新
