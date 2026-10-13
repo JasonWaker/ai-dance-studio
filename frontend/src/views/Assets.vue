@@ -4,7 +4,7 @@
       <template #header>
         <div class="head">
           <span class="card-title">资产库</span>
-          <el-button type="primary" :icon="Plus" @click="openCreate">新建{{ cur.conf.label }}</el-button>
+          <el-button type="primary" :icon="Plus" @click="openCreate">新建{{ cur.label }}</el-button>
         </div>
       </template>
       <el-tabs v-model="activeTab" @tab-change="load">
@@ -30,9 +30,9 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="dialog" :title="'新建' + cur.conf.label" width="520px">
+    <el-dialog v-model="dialog" :title="'新建' + cur.label" width="520px">
       <el-form label-width="90px">
-        <el-form-item v-for="f in cur.conf.form" :key="f.key" :label="f.label">
+        <el-form-item v-for="f in cur.form" :key="f.key" :label="f.label">
           <el-input v-if="f.type === 'text'" v-model="form[f.key]" :placeholder="f.placeholder || ''" />
           <el-input v-else-if="f.type === 'number'" v-model.number="form[f.key]" type="number" placeholder="可留空" />
           <div v-else-if="f.type === 'upload'" style="width:100%">
