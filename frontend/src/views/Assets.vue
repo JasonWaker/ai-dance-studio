@@ -22,15 +22,16 @@
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100" fixed="right">
+        <el-table-column label="操作" width="130" fixed="right">
           <template #default="{ row }">
+            <el-button size="small" type="primary" text @click="openEdit(row)">编辑</el-button>
             <el-button size="small" type="danger" text @click="remove(row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
 
-    <el-dialog v-model="dialog" :title="'新建' + cur.label" width="520px">
+    <el-dialog v-model="dialog" :title="(editingId ? '编辑' : '新建') + cur.label" width="520px">
       <el-form label-width="90px">
         <el-form-item v-for="f in cur.form" :key="f.key" :label="f.label">
           <el-input v-if="f.type === 'text'" v-model="form[f.key]" :placeholder="f.placeholder || ''" />
@@ -68,6 +69,7 @@ import { AssetsApi, BeatApi } from '@/api'
 const activeTab = ref('models')
 const rows = ref([])
 const dialog = ref(false)
+const editingId = ref(null)
 const form = ref({})
 const uploading = ref({})
 
@@ -152,6 +154,15 @@ async function load() {
 function openCreate() {
   form.value = {}
   uploading.value = {}
+  editingId.value = null
+  dialog.value = true
+}
+function openEdit(row) {
+  const f = {}
+  cur.value.form.forEach((item) => { if (row[item.key] != null) f[item.key] = row[item.key] })
+  form.value = f
+  uploading.value = {}
+  editingId.value = row.id
   dialog.value = true
 }
 async function doUpload(opt, field) {
@@ -183,8 +194,14 @@ async function create() {
   const data = { ...form.value }
   Object.keys(data).forEach((k) => { if (data[k] === '' || data[k] === undefined) delete data[k] })
   try {
-    await AssetsApi.create(cur.value.api, data)
-    ElMessage.success('已保存')
+    if (editingId.value) {
+      await AssetsApi.update(cur.value.api, editingId.value, data)
+      ElMessage.success('已更新')
+    } else {
+      await AssetsApi.create(cur.value.api, data)
+      ElMessage.success('已保存')
+    }
+    editingId.value = null
     dialog.value = false
     load()
   } catch (e) {
