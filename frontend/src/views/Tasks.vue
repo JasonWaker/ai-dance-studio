@@ -170,6 +170,7 @@ import { ElMessage } from 'element-plus'
 import { TasksApi, AssetsApi, TemplatesApi, PromptsApi, HealthApi } from '@/api'
 
 const models = [
+  { value: 'seedream-4.0', label: 'Seedream 4.0（生图定妆图·按张计费）' },
   { value: 'seedance-2.5', label: 'Seedance 2.5（音频驱动·30s·¥2/秒）' },
   { value: 'seedance-2.0', label: 'Seedance 2.0（视频参考·15s·¥1/秒）' },
   { value: 'seedance-2.0-fast', label: 'Seedance 2.0 fast（低成本·¥0.8/秒）' },
@@ -202,8 +203,8 @@ const detailDialog = ref(false)
 const detail = ref(null)
 
 const costTip = computed(() => {
-  const m = models.find((x) => x.value === form.value.model_version)
   const sec = Math.max(4, form.value.duration)
+  if (form.value.model_version === 'seedream-4.0') return '生图按张计费（约¥0.5/张，以官方为准）'
   if (form.value.model_version?.startsWith('kling')) return '可灵按官方积分计价（约¥0.3-1/秒）'
   const price = { 'seedance-2.5': 2, 'seedance-2.0': 1, 'seedance-2.0-fast': 0.8, 'seedance-2.0-mini': 0.5 }[form.value.model_version] || 1
   return `约 ¥${(price * sec).toFixed(1)}（${sec}秒）`
@@ -219,7 +220,7 @@ function onTypeChange() {
   if (form.value.type === 'dance' && !form.value.model_version?.startsWith('seedance')) {
     form.value.model_version = 'seedance-2.0-mini' // 舞蹈直出默认最省钱模型
   }
-  if (form.value.type === 'image') form.value.model_version = 'seedance-2.5'
+  if (form.value.type === 'image' || form.value.type === 'outfit') form.value.model_version = 'seedream-4.0'
 }
 function onTemplateChange(id) {
   const t = danceTemplates.value.find((x) => x.id === id)
