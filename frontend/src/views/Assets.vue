@@ -35,6 +35,7 @@
       <el-form label-width="90px">
         <el-form-item v-for="f in cur.form" :key="f.key" :label="f.label">
           <el-input v-if="f.type === 'text'" v-model="form[f.key]" :placeholder="f.placeholder || ''" />
+          <el-input v-else-if="f.type === 'textarea'" v-model="form[f.key]" type="textarea" :rows="2" :placeholder="f.placeholder || ''" />
           <el-input v-else-if="f.type === 'number'" v-model.number="form[f.key]" type="number" placeholder="可留空" />
           <div v-else-if="f.type === 'upload'" style="width:100%">
             <el-upload
@@ -79,13 +80,15 @@ const confs = [
       { key: 'name', label: '名称' },
       { key: 'face_seed', label: '人脸 seed' },
       { key: 'ref_image', label: '形象图', type: 'image' },
+      { key: 'remark', label: '备注' },
       { key: 'status', label: '状态', width: 90 }
     ],
     form: [
       { key: 'name', label: '名称', type: 'text', placeholder: '如：小美（辣妹风）' },
       { key: 'face_seed', label: '人脸 seed', type: 'text', placeholder: '固定 seed 保持脸一致' },
       { key: 'style_prompt', label: '画风提示词', type: 'text' },
-      { key: 'ref_image', label: '形象图', type: 'upload', urlKey: 'ref_image' }
+      { key: 'remark', label: '备注', type: 'textarea', placeholder: '记录用途/来源/注意事项（可选）' },
+      { key: 'ref_image', label: '形象图', type: 'upload', urlKey: 'ref_image' },
     ]
   },
   {
@@ -93,12 +96,14 @@ const confs = [
       { key: 'name', label: '名称' },
       { key: 'style_tag', label: '风格标签', width: 120 },
       { key: 'image', label: '服装图', type: 'image' },
+      { key: 'remark', label: '备注' },
       { key: 'status', label: '状态', width: 90 }
     ],
     form: [
       { key: 'name', label: '名称', type: 'text', placeholder: '如：辣妹风套装' },
       { key: 'style_tag', label: '风格标签', type: 'select', options: ['辣妹', '甜妹', '运动', '职场'] },
-      { key: 'image', label: '服装图', type: 'upload', urlKey: 'image' }
+      { key: 'remark', label: '备注', type: 'textarea', placeholder: '记录用途/来源/注意事项（可选）' },
+      { key: 'image', label: '服装图', type: 'upload', urlKey: 'image' },
     ]
   },
   {
@@ -106,13 +111,15 @@ const confs = [
       { key: 'name', label: '名称' },
       { key: 'type', label: '类型', width: 120 },
       { key: 'description', label: '描述' },
-      { key: 'ref_image', label: '参考图', type: 'image' }
+      { key: 'ref_image', label: '参考图', type: 'image' },
+      { key: 'remark', label: '备注' }
     ],
     form: [
       { key: 'name', label: '名称', type: 'text', placeholder: '如：居家走廊' },
       { key: 'type', label: '类型', type: 'select', options: ['居家走廊', '卧室', '街拍', '纯色背景'] },
       { key: 'description', label: '描述', type: 'text' },
-      { key: 'ref_image', label: '参考图', type: 'upload', urlKey: 'ref_image' }
+      { key: 'remark', label: '备注', type: 'textarea', placeholder: '记录用途/来源/注意事项（可选）' },
+      { key: 'ref_image', label: '参考图', type: 'upload', urlKey: 'ref_image' },
     ]
   },
   {
@@ -121,13 +128,15 @@ const confs = [
       { key: 'genre', label: '舞种', width: 120 },
       { key: 'bpm', label: 'BPM', width: 80 },
       { key: 'duration_s', label: '时长(s)', width: 90 },
-      { key: 'video_url', label: '视频', type: 'media' }
+      { key: 'video_url', label: '视频', type: 'media' },
+      { key: 'remark', label: '备注' }
     ],
     form: [
       { key: 'name', label: '名称', type: 'text', placeholder: '如：巴提巴提舞参考' },
       { key: 'genre', label: '舞种', type: 'select', options: ['K-pop', '抖音热舞', '手势舞', '经典舞'] },
       { key: 'source', label: '来源', type: 'text' },
-      { key: 'video_url', label: '舞蹈视频', type: 'upload', urlKey: 'video_url', bpmKey: 'bpm', bpmHint: true }
+      { key: 'remark', label: '备注', type: 'textarea', placeholder: '记录舞种/来源/注意事项（可选）' },
+      { key: 'video_url', label: '舞蹈视频', type: 'upload', urlKey: 'video_url', bpmKey: 'bpm', bpmHint: true },
     ]
   },
   {
@@ -135,12 +144,14 @@ const confs = [
       { key: 'name', label: '名称' },
       { key: 'style', label: '风格', width: 100 },
       { key: 'bpm', label: 'BPM', width: 80 },
-      { key: 'copyright', label: '版权', width: 110 }
+      { key: 'copyright', label: '版权', width: 110 },
+      { key: 'remark', label: '备注' }
     ],
     form: [
       { key: 'name', label: '名称', type: 'text', placeholder: '如：K-pop 舞曲 129BPM' },
       { key: 'style', label: '风格', type: 'select', options: ['K-pop', '电子', '流行', '说唱', '纯音乐'] },
       { key: 'copyright', label: '版权', type: 'select', options: ['unverified', 'own', 'licensed'] },
+      { key: 'remark', label: '备注', type: 'textarea', placeholder: '记录版权/来源/用途（可选）' },
       { key: 'audio_url', label: '音乐文件', type: 'upload', urlKey: 'audio_url', bpmKey: 'bpm', bpmHint: true }
     ]
   }

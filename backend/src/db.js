@@ -13,6 +13,14 @@ const db = new Database(DB_PATH)
 db.pragma('journal_mode = WAL')
 db.pragma('foreign_keys = ON')
 
+// 迁移：为旧库补充 remark（备注）列
+for (const t of ['model', 'outfit', 'scene', 'dance_source', 'music']) {
+  const cols = db.prepare(`PRAGMA table_info(${t})`).all()
+  if (!cols.some((c) => c.name === 'remark')) {
+    db.exec(`ALTER TABLE ${t} ADD COLUMN remark TEXT`)
+  }
+}
+
 db.exec(`
 CREATE TABLE IF NOT EXISTS model (
   id TEXT PRIMARY KEY,
@@ -20,6 +28,7 @@ CREATE TABLE IF NOT EXISTS model (
   face_seed TEXT,
   style_prompt TEXT,
   ref_image TEXT,
+  remark TEXT,
   status TEXT DEFAULT 'active',
   created_at TEXT DEFAULT (datetime('now'))
 );
@@ -28,6 +37,7 @@ CREATE TABLE IF NOT EXISTS outfit (
   name TEXT NOT NULL,
   image TEXT,
   style_tag TEXT,
+  remark TEXT,
   status TEXT DEFAULT 'active',
   created_at TEXT DEFAULT (datetime('now'))
 );
@@ -37,6 +47,7 @@ CREATE TABLE IF NOT EXISTS scene (
   type TEXT,
   ref_image TEXT,
   description TEXT,
+  remark TEXT,
   status TEXT DEFAULT 'active',
   created_at TEXT DEFAULT (datetime('now'))
 );
@@ -50,6 +61,7 @@ CREATE TABLE IF NOT EXISTS dance_source (
   source TEXT,
   hot_score REAL DEFAULT 0,
   music_id TEXT,
+  remark TEXT,
   status TEXT DEFAULT 'active',
   created_at TEXT DEFAULT (datetime('now'))
 );
@@ -60,6 +72,7 @@ CREATE TABLE IF NOT EXISTS music (
   bpm REAL,
   style TEXT,
   copyright TEXT DEFAULT 'unverified',
+  remark TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );
 CREATE TABLE IF NOT EXISTS prompt_library (
@@ -136,6 +149,12 @@ CREATE TABLE IF NOT EXISTS batch (
   created_at TEXT DEFAULT (datetime('now'))
 );
 `)
+
+// 兼容旧库：为资产表补充 remark 列
+for (const t of ['model', 'outfit', 'scene', 'dance_source', 'music']) {
+  const cols = db.prepare(`PRAGMA table_info(${t})`).all().map((c) => c.name)
+  if (!cols.includes('remark')) db.exec(`ALTER TABLE ${t} ADD COLUMN remark TEXT`)
+}
 
 // ---------- 种子数据（首次启动） ----------
 const count = db.prepare('SELECT COUNT(*) AS c FROM prompt_library').get().c

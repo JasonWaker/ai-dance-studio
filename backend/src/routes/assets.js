@@ -26,11 +26,11 @@ router.post('/upload', upload.single('file'), (req, res) => {
 
 // ---------- 通用 CRUD 帮助函数 ----------
 const tables = {
-  models: { table: 'model', fields: ['name', 'face_seed', 'style_prompt', 'ref_image', 'status'] },
-  outfits: { table: 'outfit', fields: ['name', 'image', 'style_tag', 'status'] },
-  scenes: { table: 'scene', fields: ['name', 'type', 'ref_image', 'description', 'status'] },
-  danceSources: { table: 'dance_source', fields: ['name', 'video_url', 'duration_s', 'bpm', 'genre', 'source', 'hot_score', 'music_id', 'status'] },
-  music: { table: 'music', fields: ['name', 'audio_url', 'bpm', 'style', 'copyright'] }
+  models: { table: 'model', fields: ['name', 'face_seed', 'style_prompt', 'ref_image', 'remark', 'status'] },
+  outfits: { table: 'outfit', fields: ['name', 'image', 'style_tag', 'remark', 'status'] },
+  scenes: { table: 'scene', fields: ['name', 'type', 'ref_image', 'description', 'remark', 'status'] },
+  danceSources: { table: 'dance_source', fields: ['name', 'video_url', 'duration_s', 'bpm', 'genre', 'source', 'hot_score', 'music_id', 'remark', 'status'] },
+  music: { table: 'music', fields: ['name', 'audio_url', 'bpm', 'style', 'copyright', 'remark'] }
 }
 
 for (const [key, conf] of Object.entries(tables)) {
