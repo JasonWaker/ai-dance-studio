@@ -13,14 +13,6 @@ const db = new Database(DB_PATH)
 db.pragma('journal_mode = WAL')
 db.pragma('foreign_keys = ON')
 
-// 迁移：为旧库补充 remark（备注）列
-for (const t of ['model', 'outfit', 'scene', 'dance_source', 'music']) {
-  const cols = db.prepare(`PRAGMA table_info(${t})`).all()
-  if (!cols.some((c) => c.name === 'remark')) {
-    db.exec(`ALTER TABLE ${t} ADD COLUMN remark TEXT`)
-  }
-}
-
 db.exec(`
 CREATE TABLE IF NOT EXISTS model (
   id TEXT PRIMARY KEY,
