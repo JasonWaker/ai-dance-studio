@@ -15,7 +15,7 @@
 
         <el-form-item label="模型版本">
           <el-select v-model="form.model_version" style="width:230px">
-            <el-option v-for="m in models" :key="m.value" :label="m.label" :value="m.value" />
+            <el-option v-for="m in modelOptions" :key="m.value" :label="m.label" :value="m.value" />
           </el-select>
           <div class="cost-tip">预估：{{ costTip }}</div>
         </el-form-item>
@@ -202,6 +202,14 @@ const creatingTpl = ref(false)
 const detailDialog = ref(false)
 const detail = ref(null)
 
+const modelOptions = computed(() => {
+  if (form.value.type === 'motion') {
+    // 动作迁移：mini/fast 不支持视频参考，隐藏避免误选
+    return models.filter((m) => m.value !== 'seedance-2.0-mini' && m.value !== 'seedance-2.0-fast')
+  }
+  return models
+})
+
 const costTip = computed(() => {
   const sec = Math.max(4, form.value.duration)
   if (form.value.model_version === 'seedream-4.0') return '生图按张计费（约¥0.5/张，以官方为准）'
@@ -217,6 +225,7 @@ function promptOf(row) {
   try { return JSON.parse(row.params || '{}').prompt || '-' } catch { return '-' }
 }
 function onTypeChange() {
+  if (form.value.type === 'motion') form.value.model_version = 'kling-v2-6' // 动作迁移默认可灵（最稳，已验证）
   if (form.value.type === 'dance' && !form.value.model_version?.startsWith('seedance')) {
     form.value.model_version = 'seedance-2.0-mini' // 舞蹈直出默认最省钱模型
   }

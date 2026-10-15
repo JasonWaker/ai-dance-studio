@@ -55,6 +55,9 @@ async function generateImage({ imageRef, prompt, ratio, params }) {
 
 /** Seedance 视频生成：全模态参考（文本/图片/视频/音频）+ 异步轮询 */
 async function generateVideo({ modelVersion, imageRef, videoRef, audioRef, prompt, duration, ratio, params }) {
+  if (videoRef && String(modelVersion).includes('mini')) {
+    throw new Error('Seedance 2.0 mini 不支持视频参考（动作迁移）。请改用 Seedance 2.5 / 2.0 或可灵 Kling 动作迁移。')
+  }
   const model = arkModel(modelVersion)
   const content = [{ type: 'text', text: prompt }]
   if (imageRef) content.push({ type: 'image_url', image_url: { url: imageRef } })
@@ -70,7 +73,13 @@ async function generateVideo({ modelVersion, imageRef, videoRef, audioRef, promp
     watermark: false,
     ...params
   }
-  const created = await axios.post(`${BASE()}/contents/generations/tasks`, body, { headers: auth(), timeout: 60000 })
+  let created
+  try {
+    created = await axios.post(`${BASE()}/contents/generations/tasks`, body, { headers: auth(), timeout: 60000 })
+  } catch (e) {
+    const detail = e.response?.data ? JSON.stringify(e.response.data).slice(0, 300) : e.message
+    throw new Error(`任务创建失败（status=${e.response?.status || '网络错误'}）: ${detail}`)
+  }
   const taskId = created.data?.id
   if (!taskId) throw new Error(`任务创建失败（status=${created.status}）: ${JSON.stringify(created.data).slice(0, 300)}`)
 
