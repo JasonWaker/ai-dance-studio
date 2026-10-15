@@ -58,6 +58,15 @@ async function runTask(task) {
 
   const params = JSON.parse(task.params || '{}')
   const assets = resolveAssets(task)
+  // 动作迁移前置校验：缺形象图/舞蹈视频时给出精准提示（替代可灵笼统报错）
+  if (task.type === 'motion') {
+    if (!assets.image) {
+      throw new Error(`动作迁移需要模特形象图：模特「${assets.model?.name || '未选择'}」未上传形象图，请先在资产库为模特上传形象图`)
+    }
+    if (!assets.video) {
+      throw new Error(`动作迁移需要舞蹈视频：舞源「${assets.dance?.name || '未选择'}」未上传舞蹈视频，请先在资产库为该舞源上传视频`)
+    }
+  }
   // 模板参数透传（如模板名/动作要点），避免默认 prompt 覆盖用户自定义
   const finalPrompt = params.prompt || buildDefaultPrompt(task, assets)
   const result = await generate({

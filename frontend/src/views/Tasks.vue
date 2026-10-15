@@ -31,7 +31,7 @@
 
         <el-form-item label="模特">
           <el-select v-model="form.model_id" clearable style="width:140px">
-            <el-option v-for="m in modelsList" :key="m.id" :label="m.name" :value="m.id" />
+            <el-option v-for="m in modelsList" :key="m.id" :label="m.name + (m.ref_image ? '' : '（无形象图）')" :value="m.id" :disabled="form.type === 'motion' && !m.ref_image" />
           </el-select>
         </el-form-item>
         <el-form-item label="造型">
@@ -46,7 +46,7 @@
         </el-form-item>
         <el-form-item v-if="form.type === 'motion'" label="舞源(参考视频)">
           <el-select v-model="form.dance_source_id" clearable style="width:140px">
-            <el-option v-for="d in danceSources" :key="d.id" :label="d.name" :value="d.id" />
+            <el-option v-for="d in danceSources" :key="d.id" :label="d.name + (d.video_url ? '' : '（未上传视频）')" :value="d.id" :disabled="!d.video_url" />
           </el-select>
         </el-form-item>
         <el-form-item v-if="form.type === 'music_drive' || form.type === 'dance'" label="音乐">
