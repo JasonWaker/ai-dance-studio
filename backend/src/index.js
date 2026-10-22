@@ -13,6 +13,7 @@ import beatRouter from './routes/beat.js'
 import generationsRouter from './routes/generations.js'
 import mediaRouter from './routes/media.js'
 import modelsRouter from './routes/models.js'
+import workerTick from './worker-tick.js'
 import { COMPLIANCE_CHECKLIST } from './compliance.js'
 
 const app = express()
@@ -51,6 +52,9 @@ app.use('/api/beat', beatRouter)
 app.use('/api/generations', generationsRouter)
 app.use('/api/media', mediaRouter)
 app.use('/api/models', modelsRouter)
+
+// Worker tick（Vercel Cron 定时触发）
+app.get('/api/worker-tick', workerTick)
 
 // 404
 app.use((req, res) => res.status(404).json({ error: 'Not Found' }))
