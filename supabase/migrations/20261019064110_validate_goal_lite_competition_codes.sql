@@ -1,0 +1,2 @@
+alter table public.goal_lite_daily_picks
+  validate constraint goal_lite_daily_picks_competition_code_check;;

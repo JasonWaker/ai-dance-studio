@@ -1,0 +1,1 @@
+alter table public.football_feature_runs add column if not exists tracking jsonb not null default '{}'::jsonb; comment on column public.football_feature_runs.tracking is 'Per-run market recheck counts: observed, left_range and reentered.';;

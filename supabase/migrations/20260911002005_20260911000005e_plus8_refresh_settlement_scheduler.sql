@@ -1,0 +1,7 @@
+create or replace function plus8_internal.refresh_settlement_scheduler()
+returns void
+language plpgsql
+as $$
+begin
+  perform cron.schedule('plus8-settle-confirmed-results', '*/15 * * * *', 'select 1');
+end;$$;;

@@ -1,0 +1,1 @@
+alter table public.monitored_teams add column if not exists league_name text not null default '', add column if not exists reference_url text not null default '', add column if not exists verification_status text not null default 'legacy', add column if not exists verification_error text, add column if not exists verification_evidence jsonb;;

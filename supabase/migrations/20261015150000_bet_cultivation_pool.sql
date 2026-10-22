@@ -1,0 +1,1 @@
+-- applied from supabase/migrations/20261015150000_bet_cultivation_pool.sql;

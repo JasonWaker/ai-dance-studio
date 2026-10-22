@@ -9,6 +9,7 @@
     "start": "node src/index.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.78.0",
     "axios": "^1.7.9",
     "better-sqlite3": "^11.7.0",
     "cors": "^2.8.5",

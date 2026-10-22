@@ -1,0 +1,1 @@
+alter table public.monitored_teams add column if not exists task_type text not null default 'team' check (task_type in ('team','league')), add column if not exists last_scan_at timestamptz, add column if not exists last_match_at timestamptz;;

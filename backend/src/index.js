@@ -10,6 +10,9 @@ import topicsRouter from './routes/topics.js'
 import tasksRouter from './routes/tasks.js'
 import videosRouter from './routes/videos.js'
 import beatRouter from './routes/beat.js'
+import generationsRouter from './routes/generations.js'
+import mediaRouter from './routes/media.js'
+import modelsRouter from './routes/models.js'
 import { COMPLIANCE_CHECKLIST } from './compliance.js'
 
 const app = express()
@@ -45,6 +48,9 @@ app.use('/api/topics', topicsRouter)
 app.use('/api/tasks', tasksRouter)
 app.use('/api/videos', videosRouter)
 app.use('/api/beat', beatRouter)
+app.use('/api/generations', generationsRouter)
+app.use('/api/media', mediaRouter)
+app.use('/api/models', modelsRouter)
 
 // 404
 app.use((req, res) => res.status(404).json({ error: 'Not Found' }))

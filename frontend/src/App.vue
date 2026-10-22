@@ -6,10 +6,14 @@
         <span>AI 卡点舞工作台</span>
       </div>
       <el-menu :default-active="route.path" router class="menu">
+        <el-menu-item index="/generate"><el-icon><VideoCamera /></el-icon><b>AI 视频生成</b></el-menu-item>
+        <el-menu-item index="/jobs"><el-icon><List /></el-icon>任务中心</el-menu-item>
+        <el-menu-item index="/models"><el-icon><Cpu /></el-icon>模型中心</el-menu-item>
+        <el-divider style="margin: 8px 16px; border-color: rgba(255,255,255,.12)" />
         <el-menu-item index="/dashboard"><el-icon><DataAnalysis /></el-icon>数据看板</el-menu-item>
         <el-menu-item index="/topics"><el-icon><TrendCharts /></el-icon>选题中心</el-menu-item>
         <el-menu-item index="/assets"><el-icon><Collection /></el-icon>资产库</el-menu-item>
-        <el-menu-item index="/tasks"><el-icon><VideoPlay /></el-icon>任务台</el-menu-item>
+        <el-menu-item index="/tasks"><el-icon><VideoPlay /></el-icon>旧任务台</el-menu-item>
         <el-menu-item index="/review"><el-icon><Checked /></el-icon>质检台</el-menu-item>
         <el-menu-item index="/prompts"><el-icon><MagicStick /></el-icon>提示词中心</el-menu-item>
         <el-menu-item index="/videos"><el-icon><FolderOpened /></el-icon>成品库</el-menu-item>

@@ -1,0 +1,1 @@
+alter table public.under3_low_odds_matches drop constraint if exists under3_low_odds_matches_trigger_under3_odds_check; alter table public.under3_low_odds_matches add constraint under3_low_odds_matches_trigger_under3_odds_check check (trigger_under3_odds >= 1.62 and trigger_under3_odds <= 1.70);;
