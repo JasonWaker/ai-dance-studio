@@ -12,11 +12,18 @@
  * 运行：node src/index.js（本地开发 / 服务器）
  * 并发：通过 lease_owner + lease_expires_at 实现，多 Worker 互不抢占
  */
-import 'dotenv/config'
-import { createClient } from '@supabase/supabase-js'
-import axios from 'axios'
-import { submitProviderJob, queryProviderJob } from '../backend/src/ai/providerV2.js'
-import { uploadRemoteUrlToStorage } from '../backend/src/services/storageService.js'
+import dotenv from 'dotenv'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// 复用 backend/.env（Worker 与后端共享密钥配置）
+// ⚠️ 必须在动态 import 之前执行：ESM 静态 import 会被提升，supabaseClient 的模块级初始化会早于 dotenv 生效
+dotenv.config({ path: path.resolve(__dirname, '../../backend/.env') })
+
+const { createClient } = await import('@supabase/supabase-js')
+const { submitProviderJob, queryProviderJob } = await import('../../backend/src/ai/providerV2.js')
+const { uploadRemoteUrlToStorage } = await import('../../backend/src/services/storageService.js')
 
 // ========== 配置 ==========
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://uljvndjkdfbvazhrrxmd.supabase.co'
@@ -58,14 +65,14 @@ async function getLeasableJobs() {
     .limit(CONCURRENCY_MAX)
   if (e1) { console.error('[worker] fetch queued 失败:', e1.message); return [] }
 
-  // 抢占已到轮询时间的 running/submitted 任务（租约过期）
+  // 抢占已到轮询时间的 running/submitted 任务
+  // 条件（OR 语义）：到轮询时间 next_poll_at，或租约过期（原 Worker 已死需接管）
   const now = new Date().toISOString()
   const { data: polling, error: e2 } = await supabase
     .from('generation_jobs')
     .select('*')
     .in('status', ['submitted', 'running'])
-    .or(`lease_expires_at.is.null,lease_expires_at.lt.${now}`)
-    .or(`next_poll_at.is.null,next_poll_at.lte.${now}`)
+    .or(`next_poll_at.lte.${now},lease_expires_at.lt.${now},lease_expires_at.is.null`)
     .order('next_poll_at', { ascending: true, nullsFirst: true })
     .limit(CONCURRENCY_MAX)
   if (e2) console.error('[worker] fetch polling 失败:', e2.message)
@@ -191,6 +198,23 @@ async function processPolling(job) {
 
 // ========== 阶段 3: Archive ==========
 async function processArchive(job, queryResult) {
+  // CAS 抢占：running/submitted → postprocessing（归档耗时较长，防止下一轮询周期重复归档）
+  const { data: claimed, error: claimErr } = await supabase
+    .from('generation_jobs')
+    .update({
+      status: 'postprocessing',
+      lease_expires_at: new Date(Date.now() + LEASE_TIMEOUT_MS).toISOString()
+    })
+    .eq('id', job.id)
+    .in('status', ['submitted', 'running'])
+    .select('id')
+    .maybeSingle()
+
+  if (claimErr || !claimed) {
+    console.log(`[worker] ⏭️ 跳过重复归档 job=${job.id.slice(0, 8)}（已被其他周期/Worker 抢占）`)
+    return
+  }
+
   console.log(`[worker] 📦 ARCHIVE job=${job.id.slice(0,8)} 输出数=${queryResult.outputUrls?.length || 0}`)
 
   const outputUrls = queryResult.outputUrls || []
